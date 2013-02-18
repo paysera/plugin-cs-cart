@@ -5,23 +5,22 @@ require_once(dirname(__FILE__).'/libwebtopay/WebToPay.php');
 if ( !defined('AREA') ) { die('Access denied'); }
 
 if (defined('PAYMENT_NOTIFICATION')) {
-	function fn_apmokejimo_pabaiga($order_id, $pp_response, $force_notification = array())
+	function fn_payment_end($order_id, $pp_response, $force_notification = array())
 		{
-	
-	$valid_id = db_get_field("SELECT order_id FROM ?:order_data WHERE order_id = ?i AND type = 'S'", $order_id);
+			$valid_id = db_get_field("SELECT order_id FROM ?:order_data WHERE order_id = ?i AND type = 'S'", $order_id);
 
-	if (!empty($valid_id)) {
-		db_query("DELETE FROM ?:order_data WHERE order_id = ?i AND type = 'S'", $order_id);
+	if (!empty($valid_id)) 
+		{
+			db_query("DELETE FROM ?:order_data WHERE order_id = ?i AND type = 'S'", $order_id);
 
-		fn_update_order_payment_info($order_id, $pp_response);
+			fn_update_order_payment_info($order_id, $pp_response);
 
-		if ($pp_response['order_status'] == 'N' && !empty($_SESSION['cart']['placement_action']) && $_SESSION['cart']['placement_action'] == 'repay') {
+			if ($pp_response['order_status'] == 'N' && !empty($_SESSION['cart']['placement_action']) && $_SESSION['cart']['placement_action'] == 'repay') {
 			$pp_response['order_status'] = 'I';
 		}
-
-		fn_set_hook('finish_payment', $order_id, $pp_response, $force_notification);
+			fn_set_hook('finish_payment', $order_id, $pp_response, $force_notification);
 	}
-	fn_change_order_status($order_id, $pp_response['order_status'], '', $force_notification);
+			fn_change_order_status($order_id, $pp_response['order_status'], '', $force_notification);
 }
 
 	if ($mode == 'return') {
@@ -31,16 +30,17 @@ if (defined('PAYMENT_NOTIFICATION')) {
 				fn_change_order_status($_REQUEST['orderId'], 'O', '', false);
 			}
 		}
-		fn_order_placement_routines($_REQUEST['orderId'], false);
+			fn_order_placement_routines($_REQUEST['orderId'], false);
 	} elseif ($mode == 'callback') {
-		
-		 $order_info = fn_get_order_info($_REQUEST['orderId']);
-			 if (empty($processor_data)) {
+		 	$order_info = fn_get_order_info($_REQUEST['orderId']);
+			 if (empty($processor_data)) 
+			 {
 				 $processor_data = fn_get_processor_data($order_info['payment_id']);
 			 }
-			 	if (empty($order_info)) {
+			 if (empty($order_info)) 
+			 {
 				throw new Exception(sprintf("Missing order by specified id (order_id=%s)", $response['orderid']));
-			}
+			 }
 		
 		try {
 			$response = WebToPay::checkResponse($_REQUEST, array(
@@ -61,15 +61,13 @@ if (defined('PAYMENT_NOTIFICATION')) {
 						throw new Exception('The amounts do not match.');
 					}
 					$response = $response + array('order_status' => 'O');
-					print_r($response);
+					
 					 if($response['order_status'] == 'O'){
 					 	$response['order_status'] = 'P';
-						
-					 	fn_apmokejimo_pabaiga($response['orderid'], $response);
+					 	fn_payment_end($response['orderid'], $response);
 					 }else{
-					fn_change_order_status($response['orderid'], 'P');
-					
-					 }
+						fn_change_order_status($response['orderid'], 'P');
+				}
 			 }	
 			
 			exit("OK");
@@ -77,16 +75,12 @@ if (defined('PAYMENT_NOTIFICATION')) {
 			exit(sprintf("ERROR: %s", $e->getMessage()));
 		}
 	} elseif ($mode == 'cancel') {
-		
-		
-			fn_apmokejimo_pabaiga($_REQUEST['orderId'], $response);
-			fn_order_placement_routines($_REQUEST['orderId']);
-			exit;
-	
+		fn_payment_end($_REQUEST['orderId'], $response);
+		fn_order_placement_routines($_REQUEST['orderId']);
+		exit;
 }
 	exit;
-	
-} else {
+}else{
 	
 	$_order_id = ($order_info['repaid']) ? ($order_id . '_' . $order_info['repaid']) : $order_id;
 
