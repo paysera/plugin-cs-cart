@@ -8,8 +8,7 @@ Version of specification: 1.6
 Installation
 
 1. Download the repository files.
-2. Put fn.cart.php in default_cscart_directory/core
-3. Put webtopay.php in default_cscart_directory/payments
+2. Put webtopay.php in default_cscart_directory/payments
 
 Contacts
 
