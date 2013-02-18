@@ -168,12 +168,13 @@ class WebToPay {
      *
      * If response is not correct, WebToPayException will be raised.
      *
-     * @param array $response Response array
+     * @param array $query    Response array
      * @param array $userData
      *
      * @return array
      *
      * @throws WebToPayException
+     * @deprecated use validateAndParseData() and check status code yourself
      */
     public static function checkResponse($query, $userData = array()) {
         $projectId = isset($userData['projectid']) ? $userData['projectid'] : null;
@@ -183,7 +184,7 @@ class WebToPay {
         try {
             $data = self::validateAndParseData($query, $projectId, $password);
             if ($data['type'] == 'macro' && $data['status'] != 1) {
-                throw new WebToPayException('Expected status code 1');
+                throw new WebToPayException('Expected status code 1', WebToPayException::E_DEPRECATED_USAGE);
             }
 
             if ($logFile) {
@@ -192,7 +193,7 @@ class WebToPay {
             return $data;
 
         } catch (WebToPayException $exception) {
-            if ($logFile) {
+        	if ($logFile && $exception->getCode() != WebToPayException::E_DEPRECATED_USAGE) {
                 self::log('ERR', $exception . "\nQuery: " . http_build_query($query), $logFile);
             }
             throw $exception;
@@ -223,6 +224,7 @@ class WebToPay {
      * @param array $userData
      *
      * @throws WebToPayException
+     * @throws WebToPay_Exception_Validation
      */
     public static function smsAnswer($userData) {
         if (!isset($userData['id']) || !isset($userData['msg']) || !isset($userData['sign_password'])) {
@@ -278,7 +280,7 @@ class WebToPay {
     protected static function log($type, $msg, $logfile) {
         $fp = @fopen($logfile, 'a');
         if (!$fp) {
-            return false;
+            return;
         }
 
         $logline = array(
@@ -358,6 +360,11 @@ class WebToPayException extends Exception {
      * Errors in remote service - it returns some invalid data
      */
     const E_SERVICE = 10;
+    
+    /**
+     * Deprecated usage errors
+     */
+    const E_DEPRECATED_USAGE = 11;
 
     /**
      * @var string|boolean
@@ -745,6 +752,8 @@ class WebToPay_PaymentMethodList {
      *
      * @param string $countryCode
      * @param array  $titleTranslations
+     *
+     * @return WebToPay_PaymentMethodCountry
      */
     protected function createCountry($countryCode, array $titleTranslations = array()) {
         return new WebToPay_PaymentMethodCountry($countryCode, $titleTranslations, $this->defaultLanguage);
@@ -807,7 +816,7 @@ class WebToPay_SmsAnswerSender {
  */
 class WebToPay_Exception_Validation extends WebToPayException {
 
-    public function __construct($message, $code = null, $field = null, $previousException = null) {
+    public function __construct($message, $code = 0, $field = null, Exception $previousException = null) {
         parent::__construct($message, $code, $previousException);
         if ($field) {
             $this->setField($field);
@@ -872,10 +881,11 @@ class WebToPay_CallbackValidator {
      * @return array Parsed callback parameters
      *
      * @throws WebToPayException
+     * @throws WebToPay_Exception_Callback
      */
     public function validateAndParseData(array $requestData) {
         if (!$this->signer->checkSign($requestData)) {
-            throw new WebToPay_Exception_Callback('Invalid sign parameters');
+            throw new WebToPay_Exception_Callback('Invalid sign parameters, check $_GET length limit');
         }
 
         if (!isset($requestData['data'])) {
@@ -991,7 +1001,7 @@ class WebToPay_RequestBuilder {
      * This method checks all given data and generates correct request data
      * array or raises WebToPayException on failure.
      *
-     * @param  array $data information about current repeated payment request
+     * @param string $orderId order id of repeated request
      *
      * @return array
      *
@@ -1008,7 +1018,8 @@ class WebToPay_RequestBuilder {
     /**
      * Checks data to be valid by passed specification
      *
-     * @param  array $data
+     * @param array $data
+     * @param array $specs
      *
      * @throws WebToPay_Exception_Validation
      */
@@ -1118,8 +1129,7 @@ class WebToPay_Sign_SS1SignChecker implements WebToPay_Sign_SignCheckerInterface
     /**
      * Check for SS1, which is not depend on openssl functions.
      *
-     * @param  array  $response
-     * @param  string $password
+     * @param array $request
      *
      * @return boolean
      *
@@ -1343,6 +1353,8 @@ class WebToPay_Factory {
      * @throws WebToPay_Exception_Configuration
      *
      * @return WebToPay_Sign_SignCheckerInterface
+     *
+     * @throws WebToPayException
      */
     protected function getSigner() {
         if ($this->signer === null) {
@@ -1429,6 +1441,7 @@ class WebToPay_PaymentMethodCountry {
      * Constructs object
      *
      * @param string $countryCode
+     * @param array  $titleTranslations
      * @param string $defaultLanguage
      */
     public function __construct($countryCode, $titleTranslations, $defaultLanguage = 'lt') {
@@ -1753,6 +1766,7 @@ class WebToPay_PaymentMethodGroup {
      *
      * @param string $groupKey
      * @param array  $translations
+     * @param string $defaultLanguage
      */
     public function __construct($groupKey, array $translations = array(), $defaultLanguage = 'lt') {
         $this->groupKey = $groupKey;
@@ -1912,9 +1926,12 @@ class WebToPay_PaymentMethodGroup {
     /**
      * Method to create new payment method instances. Overwrite if you have to use some other subclass.
      *
-     * @param string $key
-     * @param array  $logoList
-     * @param array  $titleTranslations
+     * @param string  $key
+     * @param integer $minAmount
+     * @param integer $maxAmount
+     * @param string  $currency
+     * @param array   $logoList
+     * @param array   $titleTranslations
      *
      * @return WebToPay_PaymentMethod
      */
