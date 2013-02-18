@@ -5,13 +5,25 @@ require_once(dirname(__FILE__).'/libwebtopay/WebToPay.php');
 if ( !defined('AREA') ) { die('Access denied'); }
 
 if (defined('PAYMENT_NOTIFICATION')) {
-	//callback	
-	//echo '<pre>';
-	////print_r($mode);
-	//echo '</pre>';
+	function fn_apmokejimo_pabaiga($order_id, $pp_response, $force_notification = array())
+		{
 	
-	
-	//return after order
+	$valid_id = db_get_field("SELECT order_id FROM ?:order_data WHERE order_id = ?i AND type = 'S'", $order_id);
+
+	if (!empty($valid_id)) {
+		db_query("DELETE FROM ?:order_data WHERE order_id = ?i AND type = 'S'", $order_id);
+
+		fn_update_order_payment_info($order_id, $pp_response);
+
+		if ($pp_response['order_status'] == 'N' && !empty($_SESSION['cart']['placement_action']) && $_SESSION['cart']['placement_action'] == 'repay') {
+			$pp_response['order_status'] = 'I';
+		}
+
+		fn_set_hook('finish_payment', $order_id, $pp_response, $force_notification);
+	}
+	fn_change_order_status($order_id, $pp_response['order_status'], '', $force_notification);
+}
+
 	if ($mode == 'return') {
 		if (fn_check_payment_script('webtopay.php', $_REQUEST['orderId'])) {
 			$order_info = fn_get_order_info($_REQUEST['orderId'], true);
@@ -20,7 +32,6 @@ if (defined('PAYMENT_NOTIFICATION')) {
 			}
 		}
 		fn_order_placement_routines($_REQUEST['orderId'], false);
-		//return after payment
 	} elseif ($mode == 'callback') {
 		
 		 $order_info = fn_get_order_info($_REQUEST['orderId']);
@@ -30,45 +41,18 @@ if (defined('PAYMENT_NOTIFICATION')) {
 			 	if (empty($order_info)) {
 				throw new Exception(sprintf("Missing order by specified id (order_id=%s)", $response['orderid']));
 			}
-			// print_r($processor_data);
-		// $amount = $order_info['total'];
-		// print_r($order_info);
 		
 		try {
 			$response = WebToPay::checkResponse($_REQUEST, array(
-		        'projectid'     => $processor_data['params']['project_id'], //32604
-		        'sign_password' => $processor_data['params']['sign'], //241cb0094ff3474abbe6a91cbb735ce0
+		        'projectid'     => $processor_data['params']['project_id'], 
+		        'sign_password' => $processor_data['params']['sign'], 
 		        
 			));
 			
-			 //print_r($response);
-			
-			// $order_info = fn_get_order_info($response['orderid']);
-			// if (empty($order_info)) {
-				// throw new Exception(sprintf("Missing order by specified id (order_id=%s)", $response['orderid']));
-			// }
-				// if (empty($processor_data)) {
-				// $processor_data = fn_get_processor_data($order_info['payment_id']);
-			// }
-			
-			//print_r($processor_data);
-			// print_r($response);
-			 //print_r($order_info);
-			
-			// 1. ar status = 1
-			// 2. ar sumokejo tiek kiek reikia
-			// 3. pazymi uzsakyma kaip apmoketa
-			
-			// if ($processor_data['test'] == 'N' && $response['test'] == '1') {
-		        // throw new Exception('Test payments are not allowed');
-		    // }
 		      if ($response['status'] = 1) {
-		     	 //$response + array('order_status' => 'O')
-		     	// fn_change_order_status($response['orderid'], 'P', 'O');
-				
 			 
 				    if ($response['type'] != 'macro') {
-				        //throw new Exception('Only macro payment callbacks are accepted');
+				        throw new Exception('Only macro payment callbacks are accepted');
 				    }
 					if ($response['currency'] != $order_info['secondary_currency']){
 						throw new Exception('The currency does not match.');
@@ -80,17 +64,13 @@ if (defined('PAYMENT_NOTIFICATION')) {
 					print_r($response);
 					 if($response['order_status'] == 'O'){
 					 	$response['order_status'] = 'P';
-						// print_r($response['order_status']);
-					 	fn_finish_payment($response['orderid'], $response);
+						
+					 	fn_apmokejimo_pabaiga($response['orderid'], $response);
 					 }else{
 					fn_change_order_status($response['orderid'], 'P');
-					// fn_finish_payment($response['orderid'], $response);
+					
 					 }
 			 }	
-			// $pp_response['order_status'] = $paypal_statuses['completed'];
-			// $pp_response['reason_text'] = '';
-			// $pp_response['transaction_id'] = @$_REQUEST['txn_id'];
-			
 			
 			exit("OK");
 		} catch (Exception $e) {
@@ -98,22 +78,13 @@ if (defined('PAYMENT_NOTIFICATION')) {
 		}
 	} elseif ($mode == 'cancel') {
 		
-		// if (fn_check_payment_script('webtopay.php', $_REQUEST['orderId'])) {
-			fn_finish_payment($_REQUEST['orderId'], $response); //array('order_status' => 'O')
+		
+			fn_apmokejimo_pabaiga($_REQUEST['orderId'], $response);
 			fn_order_placement_routines($_REQUEST['orderId']);
 			exit;
-			// $order_info = fn_get_order_info($_REQUEST['orderId']);
-		// if ($order_info['status'] == 'O') {
-				// //fn_change_order_status($_REQUEST['orderId'], 'I', '', false);
-				// //db_query('DELETE FROM ?:orders WHERE order_id = ?i',  $_REQUEST['orderId']);
-				// //fn_delete_order($_REQUEST['orderId']);
-		// }
-			// fn_finish_payment($_REQUEST['orderId'], $response, false);
-			// header("Location: {$urlIndex}?dispatch=checkout.checkout");
-	// }
+	
 }
 	exit;
-	//die('callback');
 	
 } else {
 	
@@ -143,13 +114,13 @@ if (defined('PAYMENT_NOTIFICATION')) {
 			'lang'			=> ($language === 'LT') ? 'LIT' : 'ENG',
 			'amount'		=> $price,
 			'currency'		=> $currency,
-			'accepturl'		=> "{$urlIndex}?dispatch=payment_notification.return&payment=webtopay&orderId={$_order_id}",//"{$url}&answer=accept&cartId={$_order_id}", //$current_location/$index_script?dispatch=payment_notification.return&payment=paypal&order_id=$order_id //http://localhost/cscart/?dispatch=payment_notification.return&payment=webtopay&orderid=1
-			'cancelurl'		=> "{$urlIndex}?dispatch=payment_notification.cancel&payment=webtopay&orderId={$_order_id}", //$current_location/$index_script?dispatch=payment_notification.cancel&payment=paypal&order_id=$order_id   {$urlIndex}&dispatch=checkout.checkout  {$urlIndex}?dispatch=checkout.cancel&payment=webtopay&orderId={$_order_id}
+			'accepturl'		=> "{$urlIndex}?dispatch=payment_notification.return&payment=webtopay&orderId={$_order_id}",
+			'cancelurl'		=> "{$urlIndex}?dispatch=payment_notification.cancel&payment=webtopay&orderId={$_order_id}", 
 			'callbackurl'	=> "{$urlIndex}?dispatch=payment_notification.callback&payment=webtopay&orderId={$_order_id}",
 			'payment'		=> '',
 			'country'		=> $order_info['b_country'],
 			'logo'			=> '',
-//"{$urlIndex}?dispatch=payment_notification.cancel&payment=webtopay&orderId={$_order_id}",
+
 			'p_firstname'	=> $order_info['b_firstname'],
 			'p_lastname'	=> $order_info['b_lastname'],
 			'p_email'		=> $order_info['email'],
@@ -161,7 +132,6 @@ if (defined('PAYMENT_NOTIFICATION')) {
 
 			'test'			=> $w2pData['params']['test'],
 		);
-		
 		
         WebToPay::redirectToPayment($payment_info);
     } catch (WebToPayException $e) {
