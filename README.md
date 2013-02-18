@@ -9,6 +9,7 @@ Installation
 
 1. Download the repository files.
 2. Put webtopay.php in default_cscart_directory/payments
+3. Put WebToPay.php in default_cscart_directory/payments/libwebtopay/
 
 Contacts
 
