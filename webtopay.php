@@ -50,7 +50,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
 			));
 			
 		      if ($response['status'] = 1) {
-		      	    if ($response['type'] != 'macro') 
+                    if ($response['type'] != 'macro') 
                        {
                            throw new Exception('Only macro payment callbacks are accepted');
                        }
