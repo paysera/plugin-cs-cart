@@ -103,7 +103,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
 	try {
 		$payment_info = array(
 			'projectid'		=> $w2pData['params']['project_id'],
-			'sign_password' => $w2pData['params']['sign'],
+			'sign_password'	=> $w2pData['params']['sign'],
 			'orderid'		=> $_order_id,
 			'lang'			=> ($language === 'LT') ? 'LIT' : 'ENG',
 			'amount'		=> $price,
@@ -122,7 +122,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
 			'p_city'		=> $order_info['b_city'],
 			'p_state'		=> $order_info['b_state'],
 			'p_zip'			=> $order_info['b_zipcode'],
-			'p_countrycode' => $order_info['b_country'],
+			'p_countrycode'	=> $order_info['b_country'],
 
 			'test'			=> $w2pData['params']['test'],
 		);
@@ -133,4 +133,3 @@ if (defined('PAYMENT_NOTIFICATION')) {
     }
 	fn_start_payment($_order_id, false, $payment_info);
 }
-//testing
