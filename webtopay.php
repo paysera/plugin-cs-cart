@@ -48,8 +48,8 @@ if (defined('PAYMENT_NOTIFICATION')) {
 		        'sign_password' => $processor_data['params']['sign'], 
 		        
 			));
-			
-		      if ($response['status'] = 1) {
+
+             if ($response['status'] = 1) {
                     if ($response['type'] != 'macro') 
                        {
                            throw new Exception('Only macro payment callbacks are accepted');
