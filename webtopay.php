@@ -69,8 +69,8 @@ if (defined('PAYMENT_NOTIFICATION')) {
 					 	fn_payment_end($response['orderid'], $response);
 					 }else{
 						fn_change_order_status($response['orderid'], 'P');
-				}
-			 }	
+						}
+					}	
 			
 			exit("OK");
 		} catch (Exception $e) {
