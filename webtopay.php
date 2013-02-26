@@ -124,7 +124,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
 			'p_zip'         => $order_info['b_zipcode'],
 			'p_countrycode' => $order_info['b_country'],
 
-			'test'			=> $w2pData['params']['test'],
+			'test'          => $w2pData['params']['test'],
 		);
 		
         WebToPay::redirectToPayment($payment_info);
