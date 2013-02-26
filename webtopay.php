@@ -102,7 +102,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
 
 	try {
 		$payment_info = array(
-			'projectid'		=> $w2pData['params']['project_id'],
+			'projectid'		=> $w2pData['params']['project_id'],  
 			'sign_password' => $w2pData['params']['sign'],
 			'orderid'		=> $_order_id,
 			'lang'			=> ($language === 'LT') ? 'LIT' : 'ENG',
