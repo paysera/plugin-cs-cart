@@ -53,10 +53,10 @@ if (defined('PAYMENT_NOTIFICATION')) {
 		      	if ($response['type'] != 'macro') 
 		      	{
 		      		throw new Exception('Only macro payment callbacks are accepted');
-                }
-                if ($response['currency'] != $order_info['secondary_currency'])
-                {
-                	throw new Exception('The currency does not match.');
+				}
+				if ($response['currency'] != $order_info['secondary_currency'])
+				{
+					throw new Exception('The currency does not match.');
 				}
 				if ($response['amount'] < $order_info['total'])
 				{
