@@ -33,14 +33,14 @@ if (defined('PAYMENT_NOTIFICATION')) {
 			fn_order_placement_routines($_REQUEST['orderId'], false);
 	} elseif ($mode == 'callback') {
 		 	$order_info = fn_get_order_info($_REQUEST['orderId']);
-			 if (empty($processor_data)) 
-			 {
-				 $processor_data = fn_get_processor_data($order_info['payment_id']);
-			 }
-			 if (empty($order_info)) 
-			 {
+			if (empty($processor_data)) 
+			{
+				$processor_data = fn_get_processor_data($order_info['payment_id']);
+			}
+			if (empty($order_info)) 
+			{
 				throw new Exception(sprintf("Missing order by specified id (order_id=%s)", $response['orderid']));
-			 }
+			}
 		
 		try {
 			$response = WebToPay::checkResponse($_REQUEST, array(
@@ -53,7 +53,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
 			 
 				    if ($response['type'] != 'macro') {
 				        throw new Exception('Only macro payment callbacks are accepted');
-				    }
+				  	}
 					if ($response['currency'] != $order_info['secondary_currency']){
 						throw new Exception('The currency does not match.');
 					}
@@ -62,7 +62,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
 					}
 					$response = $response + array('order_status' => 'O');
 					
-					 if($response['order_status'] == 'O'){
+					if($response['order_status'] == 'O'){
 					 	$response['order_status'] = 'P';
 					 	fn_payment_end($response['orderid'], $response);
 					 }else{
@@ -103,7 +103,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
 	try {
 		$payment_info = array(
 			'projectid'		=> $w2pData['params']['project_id'],
-			'sign_password' => $w2pData['params']['sign'],
+			'sign_password'	=> $w2pData['params']['sign'],
 			'orderid'		=> $_order_id,
 			'lang'			=> ($language === 'LT') ? 'LIT' : 'ENG',
 			'amount'		=> $price,
@@ -122,7 +122,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
 			'p_city'		=> $order_info['b_city'],
 			'p_state'		=> $order_info['b_state'],
 			'p_zip'			=> $order_info['b_zipcode'],
-			'p_countrycode' => $order_info['b_country'],
+			'p_countrycode'	=> $order_info['b_country'],
 
 			'test'			=> $w2pData['params']['test'],
 		);
