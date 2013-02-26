@@ -63,14 +63,13 @@ if (defined('PAYMENT_NOTIFICATION')) {
 					throw new Exception('The amounts do not match.');
 				}
 					$response = $response + array('order_status' => 'O');
-					
-					 if($response['order_status'] == 'O'){
-					 	$response['order_status'] = 'P';
-					 	fn_payment_end($response['orderid'], $response);
-					 }else{
-						fn_change_order_status($response['orderid'], 'P');
-						}
-					}	
+				if($response['order_status'] == 'O'){
+					$response['order_status'] = 'P';
+					fn_payment_end($response['orderid'], $response);
+				}else{
+					fn_change_order_status($response['orderid'], 'P');
+				}
+			}	
 			
 			exit("OK");
 		} catch (Exception $e) {
