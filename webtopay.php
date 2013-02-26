@@ -102,29 +102,29 @@ if (defined('PAYMENT_NOTIFICATION')) {
 
 	try {
 		$payment_info = array(
-			'projectid'		=> $w2pData['params']['project_id'],  
+			'projectid'     => $w2pData['params']['project_id'],  
 			'sign_password' => $w2pData['params']['sign'],
-			'orderid'		=> $_order_id,
-			'lang'			=> ($language === 'LT') ? 'LIT' : 'ENG',
-			'amount'		=> $price,
-			'currency'		=> $currency,
-			'accepturl'		=> "{$urlIndex}?dispatch=payment_notification.return&payment=webtopay&orderId={$_order_id}",
-			'cancelurl'		=> "{$urlIndex}?dispatch=payment_notification.cancel&payment=webtopay&orderId={$_order_id}", 
-			'callbackurl'	=> "{$urlIndex}?dispatch=payment_notification.callback&payment=webtopay&orderId={$_order_id}",
-			'payment'		=> '',
-			'country'		=> $order_info['b_country'],
-			'logo'			=> '',
+			'orderid'       => $_order_id,
+			'lang'          => ($language === 'LT') ? 'LIT' : 'ENG',
+			'amount'        => $price,
+			'currency'      => $currency,
+			'accepturl'     => "{$urlIndex}?dispatch=payment_notification.return&payment=webtopay&orderId={$_order_id}",
+			'cancelurl'     => "{$urlIndex}?dispatch=payment_notification.cancel&payment=webtopay&orderId={$_order_id}", 
+			'callbackurl'   => "{$urlIndex}?dispatch=payment_notification.callback&payment=webtopay&orderId={$_order_id}",
+			'payment'       => '',
+			'country'       => $order_info['b_country'],
+			'logo'          => '',
 
-			'p_firstname'	=> $order_info['b_firstname'],
-			'p_lastname'	=> $order_info['b_lastname'],
-			'p_email'		=> $order_info['email'],
-			'p_street'		=> $order_info['b_address'],
-			'p_city'		=> $order_info['b_city'],
-			'p_state'		=> $order_info['b_state'],
-			'p_zip'			=> $order_info['b_zipcode'],
+			'p_firstname'   => $order_info['b_firstname'],
+			'p_lastname'    => $order_info['b_lastname'],
+			'p_email'       => $order_info['email'],
+			'p_street'      => $order_info['b_address'],
+			'p_city'        => $order_info['b_city'],
+			'p_state'       => $order_info['b_state'],
+			'p_zip'         => $order_info['b_zipcode'],
 			'p_countrycode' => $order_info['b_country'],
 
-			'test'			=> $w2pData['params']['test'],
+			'test'          => $w2pData['params']['test'],
 		);
 		
         WebToPay::redirectToPayment($payment_info);
