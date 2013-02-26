@@ -126,7 +126,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
 
 			'test'			=> $w2pData['params']['test'],
 		);
-		
+		 
         WebToPay::redirectToPayment($payment_info);
     } catch (WebToPayException $e) {
         exit(get_class($e).': '.$e->getMessage());
