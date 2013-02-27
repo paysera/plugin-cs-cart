@@ -69,15 +69,9 @@ if (defined('PAYMENT_NOTIFICATION')) {
                        fn_payment_end($response['orderid'], $response);
                     }else{
                        fn_change_order_status($response['orderid'], 'P');
-<<<<<<< HEAD
                     }
                   }	
 			
-=======
-               }
-             }	
-			 
->>>>>>> release/1.6
 			exit("OK");
 		} catch (Exception $e) {
 			exit(sprintf("ERROR: %s", $e->getMessage()));
