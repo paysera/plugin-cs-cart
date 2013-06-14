@@ -1,0 +1,22 @@
+plugin-cs-cart 1.6
+==============
+
+Paysera iskiepis CS-Cart 2.1-3.0.6
+
+Specifikacijos versija: 1.6
+
+Diegimas
+
+1. Ikelkite viska i pagrindine csCart direktorija.
+2. Ivikdykite SQL uzklausa Jusu csCart duomenu bazeje:
+REPLACE INTO cscart_payment_processors (processor_id, processor, processor_script,processor_template, admin_template, callback, type)
+	values ('1111', 'Paysera','paysera.php', 'paysera.tpl','paysera.tpl', 'N', 'P');
+3. Administravime eikite i Administration -> Payment methods -> Add payment. Naudokite siuos nustatymus: General tab -> Name = "Paysera - payment gateway", Processor -> "Paysera".
+4. Paspauskite konfiguruoti ir iveskite visus duomenis.
+Contacts
+
+Jeigu kils sunkumu kreipkites i pagalba@mokejimai.lt
+
+Istorija:
+
+2013.05.07 - Sutaisyta administracijos template
