@@ -1,10 +1,3 @@
-plugin-cs-cart 1.6
-==============
-
-Paysera plugin for CS-Cart 3.0.6
-
-Version of specification: 1.6
-
 Installation
 
 1. Download the repository files ant put them in your default cscart directory.
@@ -13,10 +6,7 @@ REPLACE INTO cscart_payment_processors (processor_id, processor, processor_scrip
 	values ('1111', 'Paysera','paysera.php', 'paysera.tpl','paysera.tpl', 'N', 'P');
 3. In administrator menu go to Administration -> Payment methods -> Add payment. Use these settings General tab -> Name = "Paysera - payment gateway", Processor -> "Paysera".
 4. Press configure and fill all the necessary information and save.
+
 Contacts
 
 If any problems occur please feel free to seek help via support@paysera.com
-
-History:
-
-2013.05.07 - Fixed admin panel template bug

@@ -11,7 +11,7 @@ Requirements
 Installation
 ------------
 
-1. Download this repository as zip and extract "payments,skins,stores" folders into csCart main directory;
+1. Download this repository as zip and extract "payments,skins,stores" folders into csCart main directory.
 2. Insert this SQL statement in your cscart database:
 REPLACE INTO cscart_payment_processors (processor_id, processor, processor_script,processor_template, admin_template, callback, type)
 	values ('1111', 'Paysera','paysera.php', 'paysera.tpl','paysera.tpl', 'N', 'P');
