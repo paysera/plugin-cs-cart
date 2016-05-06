@@ -1,9 +1,8 @@
 Installation
 
 1. Download the repository files ant put them in your default cscart directory.
-2. Insert this SQL statement in your cscart database:
-REPLACE INTO cscart_payment_processors (processor_id, processor, processor_script,processor_template, admin_template, callback, type) 
-	values ('1111', 'Paysera','paysera.php', 'paysera.tpl','paysera.tpl', 'N', 'P');
+2. Insert SQL statements from/var/databse/backup/db_changes_paysera.sql into your cscart database:
+
 3. In administrator menu go to Administration -> Payment methods -> Add payment. Use these settings General tab -> Name = "Paysera - payment gateway", Processor -> "Paysera".
 4. Press configure and fill all the necessary information and save.
 
