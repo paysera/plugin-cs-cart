@@ -1,12 +1,11 @@
 Diegimas
 
 1. Ikelkite viska i pagrindine csCart direktorija.
-2. Ivikdykite SQL uzklausa Jusu csCart duomenu bazeje:
-REPLACE INTO cscart_payment_processors (processor_id, processor, processor_script,processor_template, admin_template, callback, type)
-	values ('1111', 'Paysera','paysera.php', 'paysera.tpl','paysera.tpl', 'N', 'P');
+2. Ivikdykite SQL uzklausas esancias /var/databse/backup/db_changes_paysera.sql faile Jusu csCart duomenu bazeje.
+   
 3. Administravime eikite i Administration -> Payment methods -> Add payment. Naudokite siuos nustatymus: General tab -> Name = "Paysera - payment gateway", Processor -> "Paysera".
 4. Paspauskite konfiguruoti ir iveskite visus duomenis.
 
 Kontaktai
 
-Kilus klausimams prasome kreiptis i pagalba@mokejimai.lt
+Kilus klausimams prasome kreiptis i pagalba@paysera.lt
